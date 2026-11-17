@@ -1,2 +1,2 @@
 # Afrisage-
-African Digital reading and publishing centre 
+AfriSage is an African digital bookstore and publishing platform dedicated to promoting African literature, knowledge and creativity. It connects African authors with readers worldwide, allowing readers to discover books, explore authors and access African stories. The platform features a bookstore, author profiles, featured publications, reading resources and opportunities for writers to introduce their work.
