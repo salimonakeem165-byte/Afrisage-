@@ -1,1 +1,341 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10100e"><meta name="description" content="AfriSage — Where Stories Live, Knowledge Travels."><title>For Authors | AfriSage</title><link rel="stylesheet" href="styles.css"><link rel="manifest" href="manifest.webmanifest"></head><body><header><div class="wrap head"><a class="brand" href="index.html">AFRI<span>SAGE</span></a><nav><a href="index.html" >Home</a><a href="books.html" >Books</a><a href="authors.html" class="active">Authors</a><a href="about.html" >About</a><a href="account.html" >My Account</a></nav></div></header><main class="wrap"><section class="pagehead"><div class="eyebrow">For writers and publishers</div><h1>Your words deserve a wider world.</h1><p class="lead">AfriSage is being built to help authors reach readers while retaining a clear editorial approval process.</p></section><section class="section grid"><article class="card"><h3>1. Create an account</h3><p class="muted">Register as an author or reader-author.</p></article><article class="card"><h3>2. Submit your manuscript</h3><p class="muted">Manuscript submission will be enabled when secure author permissions and storage rules are ready.</p></article><article class="card"><h3>3. Editorial review</h3><p class="muted">Submissions will undergo screening and human editorial review. Publication requires owner approval.</p></article></section><section class="section box"><h2>Author account</h2><p class="muted">You can select Author or Reader and Author during registration.</p><a class="btn" href="account.html">Register as an author</a><p class="notice">Planned revenue share: 80% author / 20% AfriSage, subject to final published terms and payment fees.</p></section></main><footer><div class="wrap foot"><strong>AFRISAGE</strong><span class="notice">Where Stories Live, Knowledge Travels.</span></div></footer></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10100e">
+<meta name="description" content="AfriSage Author Upload Centre">
+<title>Author Centre | AfriSage</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.upload-box{max-width:760px;margin:35px auto;padding:25px}
+.upload-box label{display:block;margin:17px 0 7px;font-weight:600}
+.upload-box input,.upload-box textarea{width:100%;padding:13px;border:1px solid #aaa;border-radius:7px}
+.upload-box textarea{min-height:120px}
+.upload-box button{margin-top:22px;width:100%;cursor:pointer}
+.message{margin-top:15px;padding:12px;border-radius:7px}
+.hidden{display:none}
+.book-item{padding:15px;border-bottom:1px solid #ddd}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="wrap head">
+<a class="brand" href="index.html">AFRI<span>SAGE</span></a>
+<nav>
+<a href="index.html">Home</a>
+<a href="books.html">Books</a>
+<a href="authors.html" class="active">Authors</a>
+<a href="about.html">About</a>
+<a href="account.html">My Account</a>
+</nav>
+</div>
+</header>
+
+<main class="wrap">
+
+<section class="pagehead">
+<div class="eyebrow">AfriSage Publishing</div>
+<h1>Author Upload Centre</h1>
+<p class="lead">Share your stories and knowledge with readers across Africa and beyond.</p>
+</section>
+
+<section class="box upload-box">
+
+<h2>Submit a new book</h2>
+<p class="muted">Complete the information below and upload your manuscript and cover.</p>
+
+<div id="accountMessage" class="message">
+Checking your account...
+</div>
+
+<form id="uploadForm" class="hidden">
+
+<label for="bookTitle">Book title</label>
+<input id="bookTitle" type="text" maxlength="200" required>
+
+<label for="bookDescription">Book description / Synopsis</label>
+<textarea id="bookDescription" maxlength="10000" required></textarea>
+
+<label for="manuscript">Manuscript (PDF, DOCX or EPUB)</label>
+<input id="manuscript" type="file"
+accept=".pdf,.docx,.epub"
+required>
+
+<label for="cover">Book cover (JPG, PNG or WEBP)</label>
+<input id="cover" type="file"
+accept=".jpg,.jpeg,.png,.webp"
+required>
+
+<button class="btn" id="submitButton" type="submit">
+Submit Book for Review
+</button>
+
+</form>
+
+<div id="uploadMessage" aria-live="polite"></div>
+
+</section>
+
+<section class="section box">
+<h2>My submissions</h2>
+<div id="myBooks">
+Sign in to view your submissions.
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="wrap foot">
+<strong>AFRISAGE</strong>
+<span class="notice">Where Stories Live, Knowledge Travels.</span>
+</div>
+</footer>
+
+<script type="module">
+import { createClient } from
+"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL =
+"https://hwepbiptkyyclolujwss.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const form = document.getElementById("uploadForm");
+const accountMessage = document.getElementById("accountMessage");
+const uploadMessage = document.getElementById("uploadMessage");
+const submitButton = document.getElementById("submitButton");
+const myBooks = document.getElementById("myBooks");
+
+let currentUser = null;
+
+function showMessage(message, success=false) {
+ uploadMessage.textContent = message;
+ uploadMessage.className = "message";
+ uploadMessage.style.background = success ? "#e5f5e8" : "#fce8e8";
+}
+
+async function loadBooks() {
+ const { data, error } = await supabase
+  .from("books")
+  .select("id,title,status,created_at")
+  .eq("author_id", currentUser.id)
+  .order("created_at", {ascending:false});
+
+ if(error) {
+  myBooks.textContent = "Unable to load submissions: " + error.message;
+  return;
+ }
+
+ if(!data || data.length === 0) {
+  myBooks.textContent = "You have not submitted any books yet.";
+  return;
+ }
+
+ myBooks.replaceChildren();
+
+ data.forEach(book => {
+  const item = document.createElement("div");
+  item.className = "book-item";
+
+  const title = document.createElement("strong");
+  title.textContent = book.title;
+
+  const status = document.createElement("p");
+  status.textContent = "Status: " + (book.status || "Pending");
+
+  item.append(title, status);
+  myBooks.appendChild(item);
+ });
+}
+
+async function checkAccount() {
+ const {data, error} = await supabase.auth.getUser();
+
+ if(error || !data.user) {
+  accountMessage.textContent =
+   "Please sign in before accessing the Author Upload Centre.";
+
+  const link = document.createElement("a");
+  link.href = "account.html";
+  link.textContent = "Go to My Account";
+  accountMessage.appendChild(document.createElement("br"));
+  accountMessage.appendChild(link);
+  return;
+ }
+
+ currentUser = data.user;
+
+ accountMessage.textContent =
+  "Signed in as " + (currentUser.email || "AfriSage author");
+
+ form.classList.remove("hidden");
+
+ await loadBooks();
+}
+
+checkAccount();
+
+form.addEventListener("submit", async function(event) {
+ event.preventDefault();
+
+ if(!currentUser) {
+  showMessage("Please sign in first.");
+  return;
+ }
+
+ const title = document.getElementById("bookTitle").value.trim();
+ const description = document.getElementById("bookDescription").value.trim();
+ const manuscript = document.getElementById("manuscript").files[0];
+ const cover = document.getElementById("cover").files[0];
+
+ if(!title || !description || !manuscript || !cover) {
+  showMessage("Please complete all fields.");
+  return;
+ }
+
+ const allowedManuscripts = [
+  "pdf",
+  "docx",
+  "epub"
+ ];
+
+ const allowedCovers = [
+  "jpg",
+  "jpeg",
+  "png",
+  "webp"
+ ];
+
+ const manuscriptExtension =
+  manuscript.name.split(".").pop().toLowerCase();
+
+ const coverExtension =
+  cover.name.split(".").pop().toLowerCase();
+
+ if(!allowedManuscripts.includes(manuscriptExtension)) {
+  showMessage("Please upload a PDF, DOCX or EPUB manuscript.");
+  return;
+ }
+
+ if(!allowedCovers.includes(coverExtension)) {
+  showMessage("Please upload a JPG, PNG or WEBP cover.");
+  return;
+ }
+
+ if(manuscript.size > 50 * 1024 * 1024) {
+  showMessage("Your manuscript must not exceed 50 MB.");
+  return;
+ }
+
+ if(cover.size > 5 * 1024 * 1024) {
+  showMessage("Your cover must not exceed 5 MB.");
+  return;
+ }
+
+ submitButton.disabled = true;
+ submitButton.textContent = "Uploading...";
+ showMessage("Uploading your files. Please wait.");
+
+ const safeName = name =>
+  name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+ const folder = currentUser.id + "/" + Date.now();
+
+ const manuscriptPath =
+  folder + "_" + safeName(manuscript.name);
+
+ const coverPath =
+  folder + "_" + safeName(cover.name);
+
+ let manuscriptUploaded = false;
+ let coverUploaded = false;
+
+ try {
+  const manuscriptResult = await supabase.storage
+   .from("manuscripts")
+   .upload(manuscriptPath, manuscript);
+
+  if(manuscriptResult.error) {
+   throw manuscriptResult.error;
+  }
+
+  manuscriptUploaded = true;
+
+  const coverResult = await supabase.storage
+   .from("book-covers")
+   .upload(coverPath, cover);
+
+  if(coverResult.error) {
+   throw coverResult.error;
+  }
+
+  coverUploaded = true;
+
+  const {data: book, error: bookError} = await supabase
+   .from("books")
+   .insert({
+    author_id: currentUser.id,
+    title: title,
+    description: description,
+    cover_path: coverPath,
+    manuscript_path: manuscriptPath,
+    status: "pending"
+   })
+   .select("id")
+   .single();
+
+  if(bookError) {
+   throw bookError;
+  }
+
+  const {error: submissionError} = await supabase
+   .from("book_submissions")
+   .insert({
+    book_id: book.id
+   });
+
+  if(submissionError) {
+   throw submissionError;
+  }
+
+  showMessage(
+   "Your book has been submitted successfully for review!",
+   true
+  );
+
+  form.reset();
+  await loadBooks();
+
+ } catch(error) {
+
+  if(manuscriptUploaded) {
+   await supabase.storage
+    .from("manuscripts")
+    .remove([manuscriptPath]);
+  }
+
+  if(coverUploaded) {
+   await supabase.storage
+    .from("book-covers")
+    .remove([coverPath]);
+  }
+
+  showMessage("Submission failed: " + error.message);
+
+ } finally {
+  submitButton.disabled = false;
+  submitButton.textContent = "Submit Book for Review";
+ }
+});
+</script>
+
+</body>
+</html>
