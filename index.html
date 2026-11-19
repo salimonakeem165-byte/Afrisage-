@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#10100e">
+<meta name="description" content="AfriSage — Where Stories Live, Knowledge Travels.">
 <title>AfriSage — Where Stories Live</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
@@ -12,33 +13,278 @@
 body{margin:0;background:var(--bg);color:var(--cream);font:16px/1.6 system-ui,sans-serif}
 a{color:inherit;text-decoration:none}
 button,.btn{display:inline-block;border:0;border-radius:30px;padding:12px 18px;background:var(--gold);color:#17140d;font-weight:700;cursor:pointer}
-header,footer{border-bottom:1px solid var(--line);padding:16px}
-header .wrap,footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
-.brand{font-size:1.4rem;font-weight:900}
+button:disabled{opacity:.6;cursor:wait}
+header{position:sticky;top:0;background:#10100eef;z-index:5;border-bottom:1px solid var(--line);padding:16px}
+header .wrap,footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;align-items:center}
+.brand{font-size:1.4rem;font-weight:900;letter-spacing:.04em}
 .brand span,.eyebrow{color:var(--gold)}
 nav{display:flex;gap:16px;flex-wrap:wrap}
+nav a{color:var(--muted)}
 .wrap{max-width:1050px;margin:auto;padding:0 18px}
 .hero{padding:55px 0;display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:center}
-.hero h1{font:clamp(2.5rem,6vw,4.5rem)/1.05 Georgia,serif}
-.hero em{color:var(--gold)}
+.hero h1{font:clamp(2.5rem,6vw,4.5rem)/1.05 Georgia,serif;margin:14px 0}
+.hero em{color:var(--gold);font-weight:400}
+.lead,.muted,.notice{color:var(--muted)}
 .art,.box,.feature{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
-.art{text-align:center;font:8rem Georgia;color:var(--gold)}
+.art{text-align:center;font:8rem Georgia;color:var(--gold);min-height:240px;display:grid;place-content:center}
+.art small{display:block;font:.8rem system-ui;color:var(--muted);letter-spacing:.18em}
 .section{padding:30px 0}
-.muted,.notice{color:var(--muted)}
 .forms{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .box h3{margin-top:0}
 label{display:block;margin:10px 0 5px;color:var(--muted)}
-input,select{width:100%;padding:12px;border-radius:9px;border:1px solid var(--line);background:#10100e;color:var(--cream)}
-.box button{margin-top:14px}
-.status{color:var(--gold);margin-top:10px;overflow-wrap:anywhere}
+input{width:100%;padding:12px;border-radius:9px;border:1px solid var(--line);background:#10100e;color:var(--cream)}
+.box button{margin:14px 8px 0 0}
+.status{color:var(--gold);margin-top:10px;overflow-wrap:anywhere;min-height:1.5em}
 .notice{font-size:.82rem}
 .hidden{display:none!important}
 .sample{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--panel)}
-footer{border-top:1px solid var(--line);border-bottom:0;margin-top:35px;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:35px;padding:25px 0;color:var(--muted)}
 @media(max-width:700px){.hero,.forms{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <header>
-<div
+<div class="wrap">
+<a class="brand" href="#">AFRI<span>SAGE</span></a>
+<nav>
+<a href="#books">Books</a>
+<a href="#authors">For Authors</a>
+<a href="#account">Register / Log in</a>
+</nav>
+</div>
+</header>
+
+<main class="wrap">
+
+<section class="hero">
+<div>
+<div class="eyebrow">African stories. Global readers.</div>
+<h1>Where Stories Live,<br><em>Knowledge Travels.</em></h1>
+<p class="lead">Discover African writing, meet remarkable authors, and make room on your shelf for stories that stay with you.</p>
+<p>
+<a class="btn" href="#books">Explore the library</a>
+<a class="btn" href="#account">Join AfriSage</a>
+</p>
+</div>
+<div class="art">A<small>THE AFRICAN STORY HOUSE</small></div>
+</section>
+
+<section class="section" id="books">
+<div class="eyebrow">The reading room</div>
+<h2>Discover books</h2>
+<div class="sample">
+<strong>Our shelves are being prepared.</strong>
+<p class="muted">Approved titles will appear here when the publishing catalogue is connected.</p>
+</div>
+</section>
+
+<section class="section" id="authors">
+<div class="feature">
+<div class="eyebrow">For writers and publishers</div>
+<h2>Your words deserve a wider world.</h2>
+<p class="muted">Create an account, then request author access. Manuscript uploads will be enabled after author permissions and editorial review controls are configured.</p>
+<p class="notice">Planned revenue share: 80% author / 20% AfriSage, subject to published terms and payment fees. Every book requires human review and owner approval.</p>
+</div>
+</section>
+
+<section class="section" id="account">
+<div class="eyebrow">Join the community</div>
+<h2>Register or log in</h2>
+<p class="notice">Use a valid email address. If email confirmation is enabled, confirm your email before logging in. Never share your password.</p>
+
+<div class="forms">
+
+<form class="box" id="signup">
+<h3>Create an account</h3>
+<label for="signupName">Full name</label>
+<input id="signupName" name="full_name" autocomplete="name" required maxlength="100">
+
+<label for="signupEmail">Email</label>
+<input id="signupEmail" name="email" type="email" autocomplete="email" required>
+
+<label for="signupPassword">Password (at least 8 characters)</label>
+<input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
+
+<button type="submit">Create account</button>
+<div class="status" id="signupMsg" aria-live="polite"></div>
+</form>
+
+<form class="box" id="login">
+<h3>Welcome back</h3>
+<label for="loginEmail">Email</label>
+<input id="loginEmail" name="email" type="email" autocomplete="email" required>
+
+<label for="loginPassword">Password</label>
+<input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+
+<button type="submit">Log in</button>
+<button type="button" id="reset" style="background:transparent;color:var(--cream);border:1px solid var(--line)">Reset password</button>
+<div class="status" id="loginMsg" aria-live="polite"></div>
+</form>
+
+</div>
+
+<div class="box hidden" id="accountBox" style="margin-top:16px">
+<h3>Your account</h3>
+<p id="accountText" class="muted"></p>
+<p class="notice">Manuscript uploads and the founder dashboard are not enabled yet. They will be added after author permissions and administrator workflows are secured.</p>
+<button type="button" id="logout">Log out</button>
+</div>
+</section>
+
+<section class="section">
+<div class="eyebrow">About AfriSage</div>
+<h2>A home for African knowledge and imagination.</h2>
+<p class="lead">AfriSage is an African digital reading and publishing centre connecting authors with readers worldwide.</p>
+</section>
+
+</main>
+
+<footer>
+<div class="wrap">
+<strong>AFRISAGE</strong>
+<span class="notice">Early development version: payments, manuscript uploads, admin approvals and Guardian AI are not yet connected.</span>
+</div>
+</footer>
+
+<script>
+/* Remove older cached versions of the website. */
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.getRegistrations().then(registrations => {
+registrations.forEach(registration => registration.unregister());
+}).catch(() => {});
+}
+if ('caches' in window) {
+caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).catch(() => {});
+}
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://hwebpiptkyyclolujwss.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+const signupForm = document.getElementById('signup');
+const loginForm = document.getElementById('login');
+const signupMessage = document.getElementById('signupMsg');
+const loginMessage = document.getElementById('loginMsg');
+
+signupForm.addEventListener('submit', async event => {
+event.preventDefault();
+
+const formData = new FormData(signupForm);
+const fullName = String(formData.get('full_name') || '').trim();
+const email = String(formData.get('email') || '').trim();
+const password = String(formData.get('password') || '');
+
+const button = signupForm.querySelector('button[type="submit"]');
+button.disabled = true;
+signupMessage.textContent = 'Creating your account…';
+
+try {
+const {data,error} = await supabase.auth.signUp({
+email,
+password,
+options: {data: {full_name: fullName}}
+});
+
+if (error) throw error;
+
+signupMessage.textContent = data.session
+? 'Your account has been created and you are signed in.'
+: 'Registration received. Please check your email for a confirmation link.';
+
+signupForm.reset();
+await refreshAccount();
+
+} catch(error) {
+signupMessage.textContent = error.message || 'Registration could not be completed. Please try again.';
+} finally {
+button.disabled = false;
+}
+});
+
+loginForm.addEventListener('submit', async event => {
+event.preventDefault();
+
+const formData = new FormData(loginForm);
+const email = String(formData.get('email') || '').trim();
+const password = String(formData.get('password') || '');
+
+const button = loginForm.querySelector('button[type="submit"]');
+button.disabled = true;
+loginMessage.textContent = 'Logging in…';
+
+try {
+const {error} = await supabase.auth.signInWithPassword({email,password});
+if (error) throw error;
+
+loginMessage.textContent = 'You are logged in.';
+loginForm.reset();
+await refreshAccount();
+
+} catch(error) {
+loginMessage.textContent = error.message || 'Login could not be completed. Please try again.';
+} finally {
+button.disabled = false;
+}
+});
+
+document.getElementById('reset').addEventListener('click', async () => {
+const email = document.getElementById('loginEmail').value.trim();
+
+if (!email) {
+loginMessage.textContent = 'Enter your email address first, then tap Reset password.';
+return;
+}
+
+loginMessage.textContent = 'Requesting password reset…';
+
+try {
+const {error} = await supabase.auth.resetPasswordForEmail(email,{
+redirectTo: window.location.origin + window.location.pathname
+});
+
+if (error) throw error;
+
+loginMessage.textContent = 'If this email is registered, a password-reset link has been sent.';
+
+} catch(error) {
+loginMessage.textContent = error.message || 'Password reset could not be requested.';
+}
+});
+
+document.getElementById('logout').addEventListener('click', async () => {
+const {error} = await supabase.auth.signOut();
+
+loginMessage.textContent = error ? error.message : 'You have logged out.';
+await refreshAccount();
+});
+
+async function refreshAccount() {
+const {data,error} = await supabase.auth.getUser();
+const accountBox = document.getElementById('accountBox');
+
+if (error || !data.user) {
+accountBox.classList.add('hidden');
+return;
+}
+
+accountBox.classList.remove('hidden');
+document.getElementById('accountText').textContent =
+'Signed in as ' + data.user.email + '.';
+}
+
+supabase.auth.onAuthStateChange(() => {
+refreshAccount();
+});
+
+refreshAccount();
+</script>
+
+</body>
+</html>
