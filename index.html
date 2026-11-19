@@ -7,6 +7,7 @@
 <meta name="description" content="AfriSage — Where Stories Live, Knowledge Travels.">
 <title>AfriSage — Where Stories Live</title>
 <link rel="manifest" href="manifest.webmanifest">
+
 <style>
 :root{--bg:#10100e;--panel:#191916;--gold:#d7ad55;--cream:#f5efdf;--muted:#b7b1a3;--line:#39372e}
 *{box-sizing:border-box}
@@ -49,7 +50,9 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:25px 0;color:var
 @media(max-width:700px){.hero,.forms{grid-template-columns:1fr}}
 </style>
 </head>
+
 <body>
+
 <header>
   <div class="wrap">
     <a class="brand" href="#">AFRI<span>SAGE</span></a>
@@ -62,227 +65,273 @@ footer{border-top:1px solid var(--line);margin-top:35px;padding:25px 0;color:var
 </header>
 
 <main class="wrap">
-  <section class="hero">
-    <div>
-      <div class="eyebrow">African stories. Global readers.</div>
-      <h1>Where Stories Live,<br><em>Knowledge Travels.</em></h1>
-      <p class="lead">Discover African writing, meet remarkable authors, and make room on your shelf for stories that stay with you.</p>
-      <p><a class="btn" href="#books">Explore the library</a> <a class="btn" href="#account">Join AfriSage</a></p>
-    </div>
-    <div class="art">A<small>THE AFRICAN STORY HOUSE</small></div>
-  </section>
 
-  <section class="section" id="books">
-    <div class="eyebrow">The reading room</div>
-    <h2>Discover books</h2>
-    <div class="sample">
-      <strong>Our shelves are being prepared.</strong>
-      <p class="muted">Approved titles will appear here when the publishing catalogue is connected.</p>
-    </div>
-  </section>
+<section class="hero">
+  <div>
+    <div class="eyebrow">African stories. Global readers.</div>
+    <h1>Where Stories Live,<br><em>Knowledge Travels.</em></h1>
+    <p class="lead">Discover African writing, meet remarkable authors, and make room on your shelf for stories that stay with you.</p>
+    <p>
+      <a class="btn" href="#books">Explore the library</a>
+      <a class="btn" href="#account">Join AfriSage</a>
+    </p>
+  </div>
+  <div class="art">A<small>THE AFRICAN STORY HOUSE</small></div>
+</section>
 
-  <section class="section" id="authors">
-    <div class="feature">
-      <div class="eyebrow">For writers and publishers</div>
-      <h2>Your words deserve a wider world.</h2>
-      <p class="muted">Create an account, then request author access. Manuscript uploads will be enabled after author permissions and editorial review controls are configured.</p>
-      <p class="notice">Planned revenue share: 80% author / 20% AfriSage, subject to published terms and payment fees. Every book requires human review and owner approval.</p>
-    </div>
-  </section>
+<section class="section" id="books">
+  <div class="eyebrow">The reading room</div>
+  <h2>Discover books</h2>
+  <div class="sample">
+    <strong>Our shelves are being prepared.</strong>
+    <p class="muted">Approved titles will appear here when the publishing catalogue is connected.</p>
+  </div>
+</section>
 
-  <section class="section" id="account">
-    <div class="eyebrow">Join the community</div>
-    <h2>Register or log in</h2>
-    <p class="notice">Use a valid email address. If email confirmation is enabled, confirm your email before logging in. Never share your password.</p>
-    <div class="forms">
-      <form class="box" id="signup">
-        <h3>Create your AfriSage account</h3>
-        <p class="notice">A few details will help us shape your reading and publishing experience. You can update your preferences later.</p>
+<section class="section" id="authors">
+  <div class="feature">
+    <div class="eyebrow">For writers and publishers</div>
+    <h2>Your words deserve a wider world.</h2>
+    <p class="muted">Create an account, then request author access. Manuscript uploads will be enabled after author permissions and editorial review controls are configured.</p>
+    <p class="notice">Planned revenue share: 80% author / 20% AfriSage, subject to published terms and payment fees. Every book requires human review and owner approval.</p>
+  </div>
+</section>
 
-        <h4>1. Account details</h4>
-        <label for="signupName">Full name</label>
-        <input id="signupName" name="full_name" autocomplete="name" required maxlength="100">
+<section class="section" id="account">
+  <div class="eyebrow">Join the community</div>
+  <h2>Register or log in</h2>
+  <p class="notice">Use a valid email address. If email confirmation is enabled, confirm your email before logging in. Never share your password.</p>
 
-        <label for="signupEmail">Email address</label>
-        <input id="signupEmail" name="email" type="email" autocomplete="email" required>
+  <div class="forms">
 
-        <label for="signupPassword">Password (at least 8 characters)</label>
-        <input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
+<form class="box" id="signup">
 
-        <label for="confirmPassword">Confirm password</label>
-        <input id="confirmPassword" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required>
+<h3>Create your AfriSage account</h3>
+<p class="notice">A few details will help us shape your reading and publishing experience. You can update your preferences later.</p>
 
-        <h4>2. About you</h4>
-        <label for="dob">Date of birth (optional)</label>
-        <input id="dob" name="date_of_birth" type="date" autocomplete="bday">
+<h4>1. Account details</h4>
 
-        <label for="accountType">How would you like to use AfriSage?</label>
-        <select id="accountType" name="account_type" required>
-          <option value="">Choose an account type</option>
-          <option value="reader">Reader</option>
-          <option value="author">Author</option>
-          <option value="reader_author">Reader and Author</option>
-        </select>
+<label for="signupName">Full name</label>
+<input id="signupName" name="full_name" autocomplete="name" required maxlength="100">
 
-        <label for="country">Country</label>
-        <input id="country" name="country" autocomplete="country-name" placeholder="e.g. Nigeria" required maxlength="80">
+<label for="signupEmail">Email address</label>
+<input id="signupEmail" name="email" type="email" autocomplete="email" required>
 
-        <label for="state">State / Province / Region</label>
-        <input id="state" name="state" autocomplete="address-level1" required maxlength="100">
+<label for="signupPassword">Password (at least 8 characters)</label>
+<input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
 
-        <label for="city">City / Town</label>
-        <input id="city" name="city" autocomplete="address-level2" required maxlength="100">
+<label for="confirmPassword">Confirm password</label>
+<input id="confirmPassword" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required>
 
-        <label for="phone">Phone number (optional)</label>
-        <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30">
+<h4>2. About you</h4>
 
-        <div id="authorDetails" class="hidden">
-          <h4>Author profile (optional for now)</h4>
-          <label for="penName">Author name / pen name</label>
-          <input id="penName" name="pen_name" maxlength="100" placeholder="The name readers will see">
+<label for="dob">Date of birth (optional)</label>
+<input id="dob" name="date_of_birth" type="date" autocomplete="bday">
 
-          <label for="authorBio">Short author biography</label>
-          <textarea id="authorBio" name="author_bio" maxlength="700" placeholder="Tell readers a little about your writing."></textarea>
-        </div>
+<label for="accountType">How would you like to use AfriSage?</label>
+<select id="accountType" name="account_type" required>
+<option value="">Choose an account type</option>
+<option value="reader">Reader</option>
+<option value="author">Author</option>
+<option value="reader_author">Reader and Author</option>
+</select>
 
-        <h4>3. Your interests</h4>
-        <label>What brings you to AfriSage? (Choose all that apply)</label>
-        <fieldset class="checkgrid">
-          <label><input type="checkbox" name="reasons" value="Read books"> Read books</label>
-          <label><input type="checkbox" name="reasons" value="Publish my books"> Publish my books</label>
-          <label><input type="checkbox" name="reasons" value="Discover African literature"> Discover African literature</label>
-          <label><input type="checkbox" name="reasons" value="Education and research"> Education and research</label>
-          <label><input type="checkbox" name="reasons" value="Support African authors"> Support African authors</label>
-          <label><input type="checkbox" name="reasons" value="Other"> Other</label>
-        </fieldset>
+<label for="country">Country</label>
+<input id="country" name="country" autocomplete="country-name" placeholder="e.g. Nigeria" required maxlength="80">
 
-        <label>Favourite genres (optional; choose any)</label>
-        <fieldset class="checkgrid">
-          <label><input type="checkbox" name="genres" value="African literature"> African literature</label>
-          <label><input type="checkbox" name="genres" value="Romance"> Romance</label>
-          <label><input type="checkbox" name="genres" value="Thriller and suspense"> Thriller &amp; suspense</label>
-          <label><input type="checkbox" name="genres" value="Fantasy"> Fantasy</label>
-          <label><input type="checkbox" name="genres" value="Historical fiction"> Historical fiction</label>
-          <label><input type="checkbox" name="genres" value="Islamic literature"> Islamic literature</label>
-          <label><input type="checkbox" name="genres" value="Educational"> Educational</label>
-          <label><input type="checkbox" name="genres" value="Science and technology"> Science &amp; technology</label>
-          <label><input type="checkbox" name="genres" value="Biography"> Biography</label>
-          <label><input type="checkbox" name="genres" value="Poetry"> Poetry</label>
-          <label><input type="checkbox" name="genres" value="Children's books"> Children's books</label>
-          <label><input type="checkbox" name="genres" value="Other genres"> Other</label>
-        </fieldset>
+<label for="state">State / Province / Region</label>
+<input id="state" name="state" autocomplete="address-level1" required maxlength="100">
 
-        <label for="language">Preferred reading language</label>
-        <select id="language" name="preferred_language">
-          <option value="">Select a language (optional)</option>
-          <option>English</option>
-          <option>Arabic</option>
-          <option>French</option>
-          <option>Hausa</option>
-          <option>Igbo</option>
-          <option>Yoruba</option>
-          <option>Swahili</option>
-          <option>Portuguese</option>
-          <option>Other</option>
-        </select>
+<label for="city">City / Town</label>
+<input id="city" name="city" autocomplete="address-level2" required maxlength="100">
 
-        <label for="discovery">How did you hear about AfriSage? (optional)</label>
-        <select id="discovery" name="discovery_source">
-          <option value="">Select one</option>
-          <option>Social media</option>
-          <option>Friend or family</option>
-          <option>School or university</option>
-          <option>Author or writer</option>
-          <option>Search engine</option>
-          <option>Other</option>
-        </select>
+<label for="phone">Phone number (optional)</label>
+<input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30">
 
-        <label for="goal">What do you hope to achieve on AfriSage? (optional)</label>
-        <textarea id="goal" name="member_goal" maxlength="700" placeholder="Share what you hope to read, learn, publish or discover."></textarea>
+<div id="authorDetails" class="hidden">
+<h4>Author profile (optional for now)</h4>
 
-        <label class="inlinecheck"><input type="checkbox" name="terms" required> I agree to AfriSage's Terms of Service and Privacy Policy.</label>
+<label for="penName">Author name / pen name</label>
+<input id="penName" name="pen_name" maxlength="100" placeholder="The name readers will see">
 
-        <p class="notice">Please do not enter your exact home address or sensitive personal information. Your date of birth is optional.</p>
+<label for="authorBio">Short author biography</label>
+<textarea id="authorBio" name="author_bio" maxlength="700" placeholder="Tell readers a little about your writing."></textarea>
+</div>
 
-        <button type="submit">Create account</button>
-        <div class="status" id="signupMsg" aria-live="polite"></div>
-      </form>
+<h4>3. Your interests</h4>
 
-      <form class="box" id="login">
-        <h3>Welcome back</h3>
-        <label for="loginEmail">Email</label>
-        <input id="loginEmail" name="email" type="email" autocomplete="email" required>
+<label>What brings you to AfriSage? (Choose all that apply)</label>
 
-        <label for="loginPassword">Password</label>
-        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+<fieldset class="checkgrid">
+<label><input type="checkbox" name="reasons" value="Read books"> Read books</label>
+<label><input type="checkbox" name="reasons" value="Publish my books"> Publish my books</label>
+<label><input type="checkbox" name="reasons" value="Discover African literature"> Discover African literature</label>
+<label><input type="checkbox" name="reasons" value="Education and research"> Education and research</label>
+<label><input type="checkbox" name="reasons" value="Support African authors"> Support African authors</label>
+<label><input type="checkbox" name="reasons" value="Other"> Other</label>
+</fieldset>
 
-        <button type="submit">Log in</button>
-        <button type="button" id="reset" style="background:transparent;color:var(--cream);border:1px solid var(--line)">Reset password</button>
-        <div class="status" id="loginMsg" aria-live="polite"></div>
-      </form>
-    </div>
+<label>Favourite genres (optional; choose any)</label>
 
-    <div class="box hidden" id="accountBox" style="margin-top:16px">
-      <h3>Your account</h3>
-      <p id="accountText" class="muted"></p>
-      <p class="notice">Manuscript uploads and the founder dashboard are not enabled yet. They will be added after author permissions and administrator workflows are secured.</p>
-      <button type="button" id="logout">Log out</button>
-    </div>
-  </section>
+<fieldset class="checkgrid">
+<label><input type="checkbox" name="genres" value="African literature"> African literature</label>
+<label><input type="checkbox" name="genres" value="Romance"> Romance</label>
+<label><input type="checkbox" name="genres" value="Thriller and suspense"> Thriller &amp; suspense</label>
+<label><input type="checkbox" name="genres" value="Fantasy"> Fantasy</label>
+<label><input type="checkbox" name="genres" value="Historical fiction"> Historical fiction</label>
+<label><input type="checkbox" name="genres" value="Islamic literature"> Islamic literature</label>
+<label><input type="checkbox" name="genres" value="Educational"> Educational</label>
+<label><input type="checkbox" name="genres" value="Science and technology"> Science &amp; technology</label>
+<label><input type="checkbox" name="genres" value="Biography"> Biography</label>
+<label><input type="checkbox" name="genres" value="Poetry"> Poetry</label>
+<label><input type="checkbox" name="genres" value="Children's books"> Children's books</label>
+<label><input type="checkbox" name="genres" value="Other genres"> Other</label>
+</fieldset>
 
-  <section class="section">
-    <div class="eyebrow">About AfriSage</div>
-    <h2>A home for African knowledge and imagination.</h2>
-    <p class="lead">AfriSage is an African digital reading and publishing centre connecting authors with readers worldwide.</p>
-  </section>
+<label for="language">Preferred reading language</label>
+<select id="language" name="preferred_language">
+<option value="">Select a language (optional)</option>
+<option>English</option>
+<option>Arabic</option>
+<option>French</option>
+<option>Hausa</option>
+<option>Igbo</option>
+<option>Yoruba</option>
+<option>Swahili</option>
+<option>Portuguese</option>
+<option>Other</option>
+</select>
+
+<label for="discovery">How did you hear about AfriSage? (optional)</label>
+<select id="discovery" name="discovery_source">
+<option value="">Select one</option>
+<option>Social media</option>
+<option>Friend or family</option>
+<option>School or university</option>
+<option>Author or writer</option>
+<option>Search engine</option>
+<option>Other</option>
+</select>
+
+<label for="goal">What do you hope to achieve on AfriSage? (optional)</label>
+<textarea id="goal" name="member_goal" maxlength="700" placeholder="Share what you hope to read, learn, publish or discover."></textarea>
+
+<label class="inlinecheck">
+<input type="checkbox" name="terms" required>
+I agree to AfriSage's Terms of Service and Privacy Policy.
+</label>
+
+<p class="notice">Please do not enter your exact home address or sensitive personal information. Your date of birth is optional.</p>
+
+<button type="submit">Create account</button>
+<div class="status" id="signupMsg" aria-live="polite"></div>
+
+</form>
+
+<form class="box" id="login">
+<h3>Welcome back</h3>
+
+<label for="loginEmail">Email</label>
+<input id="loginEmail" name="email" type="email" autocomplete="email" required>
+
+<label for="loginPassword">Password</label>
+<input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+
+<button type="submit">Log in</button>
+
+<button type="button" id="reset" style="background:transparent;color:var(--cream);border:1px solid var(--line)">Reset password</button>
+
+<div class="status" id="loginMsg" aria-live="polite"></div>
+</form>
+
+</div>
+
+<div class="box hidden" id="accountBox" style="margin-top:16px">
+<h3>Your account</h3>
+<p id="accountText" class="muted"></p>
+<p class="notice">Manuscript uploads and the founder dashboard are not enabled yet. They will be added after author permissions and administrator workflows are secured.</p>
+<button type="button" id="logout">Log out</button>
+</div>
+
+</section>
+
+<section class="section">
+<div class="eyebrow">About AfriSage</div>
+<h2>A home for African knowledge and imagination.</h2>
+<p class="lead">AfriSage is an African digital reading and publishing centre connecting authors with readers worldwide.</p>
+</section>
+
 </main>
 
 <footer>
-  <div class="wrap">
-    <strong>AFRISAGE</strong>
-    <span class="notice">Early development version: payments, manuscript uploads, admin approvals and Guardian AI are not yet connected.</span>
-  </div>
+<div class="wrap">
+<strong>AFRISAGE</strong>
+<span class="notice">Early development version: payments, manuscript uploads, admin approvals and Guardian AI are not yet connected.</span>
+</div>
 </footer>
 
 <script>
+/* Remove an older cached service worker so it cannot keep serving the previous page. */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    registrations.forEach(registration => registration.unregister());
-  }).catch(() => {});
+  navigator.serviceWorker.getRegistrations()
+    .then(registrations => {
+      registrations.forEach(registration => registration.unregister());
+    })
+    .catch(() => {});
 }
+
 if ('caches' in window) {
-  caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key))).catch(() => {});
+  caches.keys()
+    .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+    .catch(() => {});
 }
 </script>
 
 <script type="module">
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL = 'https://hwebpiptkyyclolujwss.supabase.co';
+/* CORRECT SUPABASE PROJECT URL */
+const SUPABASE_URL = 'https://hwepbiptkyyclolujwss.supabase.co';
+
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_';
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const signupForm = document.getElementById('signup');
 const loginForm = document.getElementById('login');
+
 const signupMessage = document.getElementById('signupMsg');
 const loginMessage = document.getElementById('loginMsg');
+
 const accountTypeSelect = document.getElementById('accountType');
 const authorDetails = document.getElementById('authorDetails');
 
 accountTypeSelect.addEventListener('change', () => {
-  authorDetails.classList.toggle('hidden', !['author', 'reader_author'].includes(accountTypeSelect.value));
+  authorDetails.classList.toggle(
+    'hidden',
+    !['author', 'reader_author'].includes(accountTypeSelect.value)
+  );
 });
 
+
+/* REGISTRATION */
+
 signupForm.addEventListener('submit', async event => {
+
   event.preventDefault();
+
   const formData = new FormData(signupForm);
+
   const fullName = String(formData.get('full_name') || '').trim();
   const email = String(formData.get('email') || '').trim();
   const password = String(formData.get('password') || '');
   const confirmPassword = String(formData.get('confirm_password') || '');
   const accountType = String(formData.get('account_type') || '');
+
   const reasons = formData.getAll('reasons');
   const genres = formData.getAll('genres');
+
   const button = signupForm.querySelector('button[type="submit"]');
 
   if (password !== confirmPassword) {
@@ -309,29 +358,52 @@ signupForm.addEventListener('submit', async event => {
   signupMessage.textContent = 'Creating your account…';
 
   try {
+
     const { data, error } = await supabase.auth.signUp({
+
       email,
       password,
+
       options: {
+
         data: {
+
           full_name: fullName,
+
           date_of_birth: String(formData.get('date_of_birth') || ''),
+
           account_type: accountType,
+
           country: String(formData.get('country') || '').trim(),
+
           state: String(formData.get('state') || '').trim(),
+
           city: String(formData.get('city') || '').trim(),
+
           phone: String(formData.get('phone') || '').trim(),
+
           pen_name: String(formData.get('pen_name') || '').trim(),
+
           author_bio: String(formData.get('author_bio') || '').trim(),
+
           reasons_for_joining: reasons,
+
           favourite_genres: genres,
+
           preferred_language: String(formData.get('preferred_language') || ''),
+
           discovery_source: String(formData.get('discovery_source') || ''),
+
           member_goal: String(formData.get('member_goal') || '').trim(),
+
           terms_accepted: true,
+
           terms_accepted_at: new Date().toISOString()
+
         }
+
       }
+
     });
 
     if (error) throw error;
@@ -341,88 +413,151 @@ signupForm.addEventListener('submit', async event => {
       : 'Registration received. Please check your email for a confirmation link.';
 
     signupForm.reset();
-    authorDetails.classList.add('hidden');
+
     await refreshAccount();
 
   } catch (error) {
+
     signupMessage.textContent = error instanceof TypeError
       ? 'Connection to AfriSage account service failed. Check your internet connection, then try again. If it continues, the Supabase project URL or publishable key may need checking.'
       : (error.message || 'Registration could not be completed. Please try again.');
+
   } finally {
+
     button.disabled = false;
+
   }
+
 });
 
+
+/* LOGIN */
+
 loginForm.addEventListener('submit', async event => {
+
   event.preventDefault();
+
   const formData = new FormData(loginForm);
+
   const email = String(formData.get('email') || '').trim();
+
   const password = String(formData.get('password') || '');
+
   const button = loginForm.querySelector('button[type="submit"]');
 
   button.disabled = true;
+
   loginMessage.textContent = 'Logging in…';
 
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
     if (error) throw error;
+
     loginMessage.textContent = 'You are logged in.';
+
     loginForm.reset();
+
     await refreshAccount();
+
   } catch (error) {
+
     loginMessage.textContent = error.message || 'Login could not be completed. Please try again.';
+
   } finally {
+
     button.disabled = false;
+
   }
+
 });
 
+
+/* PASSWORD RESET */
+
 document.getElementById('reset').addEventListener('click', async () => {
+
   const email = document.getElementById('loginEmail').value.trim();
 
   if (!email) {
+
     loginMessage.textContent = 'Enter your email address first, then tap Reset password.';
+
     return;
+
   }
 
   loginMessage.textContent = 'Requesting password reset…';
 
   try {
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
+
       redirectTo: window.location.origin + window.location.pathname
+
     });
 
     if (error) throw error;
+
     loginMessage.textContent = 'If this email is registered, a password-reset link has been sent.';
+
   } catch (error) {
+
     loginMessage.textContent = error.message || 'Password reset could not be requested.';
+
   }
+
 });
+
+
+/* LOGOUT */
 
 document.getElementById('logout').addEventListener('click', async () => {
+
   const { error } = await supabase.auth.signOut();
+
   loginMessage.textContent = error ? error.message : 'You have logged out.';
+
   await refreshAccount();
+
 });
 
+
+/* ACCOUNT STATUS */
+
 async function refreshAccount() {
+
   const { data, error } = await supabase.auth.getUser();
+
   const accountBox = document.getElementById('accountBox');
 
   if (error || !data.user) {
+
     accountBox.classList.add('hidden');
+
     return;
+
   }
 
   accountBox.classList.remove('hidden');
+
   document.getElementById('accountText').textContent =
     'Signed in as ' + data.user.email + '.';
+
 }
+
 
 supabase.auth.onAuthStateChange(() => {
   refreshAccount();
 });
 
 refreshAccount();
+
 </script>
+
 </body>
-      </html>
+  </html>
