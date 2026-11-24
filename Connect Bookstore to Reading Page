@@ -1,0 +1,73 @@
+function createBookCard(book) {
+  const title = getValue(book, ["title", "book_title", "name"]) || "Untitled Book";
+  const author = getValue(book, ["author", "author_name"]) || "AfriSage Author";
+  const category = getValue(book, ["category", "genre"]) || "Other";
+
+  let cover = getValue(book, ["cover_url", "cover_image", "cover"]);
+
+  if (!cover && book.cover_path) {
+    const { data } = db.storage
+      .from("book-covers")
+      .getPublicUrl(book.cover_path);
+
+    cover = data.publicUrl;
+  }
+
+  const card = document.createElement("article");
+  card.className = "book-card";
+  card.style.cursor = "pointer";
+  card.setAttribute("role", "link");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", "Open " + title);
+
+  function openBook() {
+    if (book.id) {
+      window.location.href = "read.html?id=" + encodeURIComponent(book.id);
+    }
+  }
+
+  card.addEventListener("click", openBook);
+
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openBook();
+    }
+  });
+
+  const coverArea = document.createElement("div");
+  coverArea.className = "book-cover";
+
+  if (cover) {
+    const image = document.createElement("img");
+    image.src = cover;
+    image.alt = "Cover of " + title;
+    image.loading = "lazy";
+    coverArea.appendChild(image);
+  } else {
+    coverArea.textContent = "AfriSage Book";
+  }
+
+  const info = document.createElement("div");
+  info.className = "book-info";
+
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+
+  const authorText = document.createElement("p");
+  authorText.textContent = "By " + author;
+
+  const categoryText = document.createElement("p");
+  categoryText.className = "book-category";
+  categoryText.textContent = category;
+
+  const readText = document.createElement("p");
+  readText.textContent = "View Book →";
+  readText.style.color = "#98742c";
+  readText.style.fontWeight = "bold";
+
+  info.append(heading, authorText, categoryText, readText);
+  card.append(coverArea, info);
+
+  return card;
+}
