@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AfriSage | Founder Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f5f1;color:#222;font-family:Arial,sans-serif}
+header{background:#111;color:white;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:bold;color:#d8b45e}
+header a{color:white;text-decoration:none}
+main{max-width:1100px;margin:30px auto;padding:15px}
+h1{color:#bd943d}
+.card{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 3px 12px #0000000b}
+.stats{display:flex;gap:15px;flex-wrap:wrap}
+.stat{background:#171717;color:white;padding:20px;border-radius:8px;flex:1;min-width:130px}
+.stat strong{display:block;font-size:27px;color:#d8b45e}
+.book{border:1px solid #ddd;padding:18px;border-radius:9px;margin:15px 0}
+.book img{width:110px;max-height:150px;object-fit:contain;margin:10px 0}
+button{border:0;padding:12px 17px;border-radius:5px;margin:5px;cursor:pointer;font-weight:bold}
+.approve{background:#176b39;color:white}
+.reject{background:#a92727;color:white}
+.refresh{background:#d8b45e;color:#111}
+.message{padding:12px;margin:12px 0;border-radius:5px;background:#eee;overflow-wrap:anywhere}
+.hidden{display:none}
+.muted{color:#777}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">AfriSage</div>
+<nav>
+<a href="index.html">Visit Website</a>
+</nav>
+</header>
+
+<main>
+
+<section class="card">
+<h1>Founder Dashboard</h1>
+<p>Welcome to AfriSage administration.</p>
+<p id="accountStatus">Checking administrator access...</p>
+</section>
+
+<section id="dashboard" class="hidden">
+
+<div class="stats">
+<div class="stat">Pending Books<strong id="pendingCount">0</strong></div>
+<div class="stat">Published Books<strong id="publishedCount">0</strong></div>
+<div class="stat">Rejected Books<strong id="rejectedCount">0</strong></div>
+</div>
+
+<section class="card">
+<h2>Book Submissions</h2>
+<button class="refresh" id="refreshButton">Refresh submissions</button>
+<div id="bookList">Loading submissions...</div>
+</section>
+
+<button id="logoutButton">Sign out</button>
+
+</section>
+
+</main>
+
+<script>
+(() => {
+
+const SUPABASE_URL = "https://hwepbiptkyyclolujwss.supabase.co";
+const SUPABASE_KEY = "sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+
+const $ = id => document.getElementById(id);
+
+let db;
+let currentUser;
+
+async function start() {
+
+try {
+
+db = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+const {data,error} = await db.auth.getSession();
+
+if(error) throw error;
+
+currentUser = data.session?.user;
+
+if(!currentUser) {
+$("accountStatus").textContent =
+"Please sign in using your AfriSage account.";
+return;
+}
+
+const {data:profile,error:profileError} = await db
+.from("profiles")
+.select("full_name,email,role")
+.eq("id",currentUser.id)
+.single();
+
+if(profileError) throw profileError;
+
+if(profile.role !== "admin") {
+$("accountStatus").textContent =
+"Access denied. Administrator privileges are required.";
+return;
+}
+
+$("accountStatus").textContent =
+"Administrator verified: " + profile.full_name;
+
+$("dashboard").classList.remove("hidden");
+
+await loadBooks();
+
+} catch(error) {
+
+console.error(error);
+
+$("accountStatus").textContent =
+"Unable to open dashboard: " + error.message;
+
+}
+
+}
+
+async function loadBooks() {
+
+$("bookList").textContent = "Loading books...";
+
+const {data,error} = await db
+.from("books")
+.select("id,title,description,cover_path,status,created_at")
+.order("created_at",{ascending:false});
+
+if(error) {
+$("bookList").textContent =
+"Could not load books: " + error.message;
+return;
+}
+
+const books = data || [];
+
+$("pendingCount").textContent =
+books.filter(b=>b.status==="pending").length;
+
+$("publishedCount").textContent =
+books.filter(b=>b.status==="published").length;
+
+$("rejectedCount").textContent =
+books.filter(b=>b.status==="rejected").length;
+
+$("bookList").replaceChildren();
+
+if(!books.length) {
+$("bookList").textContent = "No books have been submitted yet.";
+return;
+}
+
+for(const book of books) {
+
+const card = document.createElement("div");
+card.className = "book";
+
+const title = document.createElement("h3");
+title.textContent = book.title || "Untitled book";
+
+const description = document.createElement("p");
+description.textContent = book.description || "No description supplied.";
+
+const status = document.createElement("p");
+status.textContent = "Status: " + book.status;
+
+card.append(title,description,status);
+
+if(book.cover_path) {
+
+const {data:imageData} = db.storage
+.from("book-covers")
+.getPublicUrl(book.cover_path);
+
+if(imageData?.publicUrl) {
+const img = document.createElement("img");
+img.src = imageData.publicUrl;
+img.alt = "Book cover";
+card.append(img);
+}
+
+}
+
+if(book.status === "pending") {
+
+const approve = document.createElement("button");
+approve.className = "approve";
+approve.textContent = "Approve book";
+
+approve.addEventListener("click",()=>{
+updateBook(book.id,"published");
+});
+
+const reject = document.createElement("button");
+reject.className = "reject";
+reject.textContent = "Reject book";
+
+reject.addEventListener("click",()=>{
+updateBook(book.id,"rejected");
+});
+
+card.append(approve,reject);
+
+}
+
+if(book.status === "published") {
+const label = document.createElement("p");
+label.className = "muted";
+label.textContent = "This book has been approved.";
+card.append(label);
+}
+
+$("bookList").append(card);
+
+}
+
+}
+
+async function updateBook(id,status) {
+
+const action = status === "published" ? "approve" : "reject";
+
+if(!confirm("Are you sure you want to "+action+" this book?")) return;
+
+const {error} = await db
+.from("books")
+.update({status})
+.eq("id",id);
+
+if(error) {
+alert("Could not update book: "+error.message);
+return;
+}
+
+alert("Book status updated successfully.");
+
+await loadBooks();
+
+}
+
+$("refreshButton").addEventListener("click",loadBooks);
+
+$("logoutButton").addEventListener("click",async()=>{
+
+await db.auth.signOut();
+
+location.href="account.html";
+
+});
+
+start();
+
+})();
+</script>
+
+</body>
+  </html>
