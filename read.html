@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read Book | AfriSage</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f5ef;color:#222;font-family:Arial,sans-serif}
+header{background:#111;color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center}
+header a{color:#e5bd62;text-decoration:none;margin-left:15px}
+.logo{font-size:24px;font-weight:bold;color:#e5bd62}
+main{max-width:950px;margin:35px auto;padding:20px}
+.book{display:grid;grid-template-columns:220px 1fr;gap:30px;background:white;padding:25px;border-radius:12px}
+.cover{width:100%;max-height:310px;object-fit:cover;border-radius:8px;background:#eee}
+h1{margin-top:0}
+.label{color:#98701e;font-weight:bold}
+.preview{background:white;margin-top:25px;padding:25px;border-radius:12px;line-height:1.8}
+button{background:#b68a32;color:white;border:0;padding:13px 20px;border-radius:6px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.message{padding:15px;background:#fff4d9;border-radius:8px;margin-top:15px}
+footer{text-align:center;padding:25px;color:#777}
+@media(max-width:600px){.book{grid-template-columns:1fr}.cover{max-width:200px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AfriSage</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="books.html">Bookstore</a>
+    <a href="account.html">Account</a>
+  </nav>
+</header>
+
+<main>
+  <div id="status" class="message">Loading book details...</div>
+
+  <section id="bookDetails" class="book" hidden>
+    <div>
+      <img id="cover" class="cover" alt="Book cover">
+    </div>
+    <div>
+      <p class="label">AFRISAGE BOOKSTORE</p>
+      <h1 id="title"></h1>
+      <p id="author"></p>
+      <p id="description"></p>
+      <p><strong>Copyright protected</strong></p>
+      <p>Read your books through AfriSage. Purchasing reading access does not transfer copyright.</p>
+    </div>
+  </section>
+
+  <section id="preview" class="preview" hidden>
+    <h2>Free Preview</h2>
+    <p id="previewMessage">
+      The free first-page preview is being prepared for this book.
+    </p>
+    <p class="message">
+      The full book requires purchase. Downloads are available only when permitted by the author.
+    </p>
+    <button id="purchaseButton" disabled>Full-book purchase coming soon</button>
+  </section>
+</main>
+
+<footer>
+  AfriSage — Where Stories Live, Knowledge Travels.
+</footer>
+
+<script>
+const SUPABASE_URL = "https://hwepbiptkyyclolujwss.supabase.co";
+const SUPABASE_KEY = "sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const statusBox = document.getElementById("status");
+const details = document.getElementById("bookDetails");
+const preview = document.getElementById("preview");
+
+function showError(message) {
+  statusBox.hidden = false;
+  statusBox.textContent = message;
+}
+
+async function loadBook() {
+  const bookId = new URLSearchParams(location.search).get("id");
+
+  if (!bookId) {
+    showError("No book was selected. Please return to the Bookstore.");
+    return;
+  }
+
+  const { data: book, error } = await db
+    .from("books")
+    .select("id,title,description,cover_path,author_id,status")
+    .eq("id", bookId)
+    .eq("status", "published")
+    .single();
+
+  if (error || !book) {
+    showError("We could not find this published book. Please return to the Bookstore.");
+    return;
+  }
+
+  document.getElementById("title").textContent = book.title || "Untitled Book";
+  document.getElementById("description").textContent =
+    book.description || "No description provided.";
+
+  const cover = document.getElementById("cover");
+
+  if (book.cover_path) {
+    const { data } = db.storage
+      .from("book-covers")
+      .getPublicUrl(book.cover_path);
+
+    cover.src = data.publicUrl;
+  } else {
+    cover.alt = "No cover available";
+  }
+
+  const { data: author } = await db
+    .from("profiles")
+    .select("full_name")
+    .eq("id", book.author_id)
+    .maybeSingle();
+
+  document.getElementById("author").textContent =
+    "By " + (author?.full_name || "AfriSage Author");
+
+  statusBox.hidden = true;
+  details.hidden = false;
+  preview.hidden = false;
+}
+
+loadBook();
+</script>
+</body>
+      </html>
