@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111">
+<title>Author Centre | AfriSage</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:16px Arial,sans-serif;background:#f8f7f3;color:#222;line-height:1.6}
+header{background:#111;color:#fff;padding:18px 6%;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.logo{font-size:26px;font-weight:bold;color:#d5ad55;text-decoration:none}
+nav{display:flex;gap:16px;flex-wrap:wrap}
+nav a{color:white;text-decoration:none}
+.hero{background:#171717;color:white;text-align:center;padding:40px 18px}
+.hero h1{color:#d5ad55;margin:0}
+main{max-width:850px;margin:25px auto;padding:0 16px}
+.card{background:white;padding:22px;border-radius:10px;margin-bottom:20px;box-shadow:0 3px 12px #0000000b}
+label{display:block;font-weight:bold;margin:14px 0 5px}
+input,textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:6px;font-size:16px}
+textarea{min-height:100px}
+button{background:#171717;color:#e4bd68;border:0;border-radius:6px;padding:13px 18px;font-weight:bold;margin-top:16px}
+button:disabled{opacity:.5}
+.hidden{display:none}
+.message{display:none;padding:12px;border-radius:6px;margin-top:12px;overflow-wrap:anywhere}
+.success{display:block;background:#e7f5e9;color:#145b27}
+.error{display:block;background:#ffeded;color:#9a1010}
+.status-item{border-bottom:1px solid #eee;padding:12px 0}
+footer{background:#111;color:#ccc;text-align:center;padding:22px;margin-top:35px}
+</style>
+</head>
+<body>
+
+<header>
+<a class="logo" href="index.html">AfriSage</a>
+<nav>
+<a href="index.html">Home</a>
+<a href="books.html">Bookstore</a>
+<a href="about.html">About</a>
+<a href="account.html">Account</a>
+</nav>
+</header>
+
+<section class="hero">
+<h1>AfriSage Author Centre</h1>
+<p>Publish your stories and share your knowledge with readers.</p>
+</section>
+
+<main>
+<section class="card" id="welcomeCard">
+<h2>Author access</h2>
+<p id="loginStatus">Connecting securely to your account…</p>
+<a href="account.html">Go to your AfriSage account</a>
+</section>
+
+<section class="card hidden" id="submissionCard">
+<h2>Submit a book</h2>
+<p>Upload your manuscript and cover for review.</p>
+
+<form id="submissionForm">
+<label for="bookTitle">Book title</label>
+<input id="bookTitle" maxlength="200" required>
+
+<label for="bookDescription">Book description / synopsis</label>
+<textarea id="bookDescription" maxlength="5000" required></textarea>
+
+<label for="manuscript">Manuscript (PDF, DOCX or EPUB; maximum 50 MB)</label>
+<input id="manuscript" type="file" accept=".pdf,.docx,.epub" required>
+
+<label for="cover">Cover image (JPG, PNG or WEBP; maximum 5 MB)</label>
+<input id="cover" type="file" accept=".jpg,.jpeg,.png,.webp" required>
+
+<button id="submitButton" type="submit">Submit book for review</button>
+<div id="submissionMessage" class="message" role="status"></div>
+</form>
+</section>
+
+<section class="card hidden" id="trackingCard">
+<h2>My submissions</h2>
+<div id="submissionList">Loading…</div>
+</section>
+
+<section class="card hidden" id="logoutCard">
+<p id="userEmail"></p>
+<button id="logoutButton" type="button">Sign out</button>
+</section>
+</main>
+
+<footer>
+<strong>AfriSage</strong><br>
+Where Stories Live, Knowledge Travels.<br>
+© 2026 AfriSage
+</footer>
+
+<script>
+(()=>{
+const URL="https://hwepbiptkyyclolujwss.supabase.co";
+const KEY="sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+
+const $=id=>document.getElementById(id);
+let db=null,user=null;
+
+function msg(id,text,type){
+const e=$(id);
+e.textContent=text;
+e.className="message "+type;
+}
+
+function fileName(n){
+return n.normalize("NFKD").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100)||"file";
+}
+
+async function loadBooks(){
+const box=$("submissionList");
+box.textContent="Loading your books…";
+
+const {data,error}=await db.from("books")
+.select("id,title,status,created_at")
+.eq("author_id",user.id)
+.order("created_at",{ascending:false});
+
+if(error){
+box.textContent="Could not load submissions: "+error.message;
+return;
+}
+
+box.replaceChildren();
+
+if(!data?.length){
+box.textContent="You have not submitted any books yet.";
+return;
+}
+
+data.forEach(b=>{
+const row=document.createElement("div");
+row.className="status-item";
+
+const t=document.createElement("strong");
+t.textContent=b.title||"Untitled";
+
+const s=document.createElement("p");
+s.textContent="Status: "+(b.status||"Submitted");
+
+row.append(t,s);
+box.append(row);
+});
+}
+
+async function init(){
+if(!window.supabase?.createClient){
+$("loginStatus").textContent="The sign-in service did not load. Refresh the page and try again.";
+return;
+}
+
+try{
+db=window.supabase.createClient(URL,KEY,{
+auth:{
+persistSession:true,
+autoRefreshToken:true,
+detectSessionInUrl:true
+}
+});
+
+const {data,error}=await db.auth.getSession();
+
+if(error)throw error;
+
+user=data.session?.user||null;
+
+if(!user){
+$("loginStatus").textContent="Please sign in on your AfriSage Account page, then return here.";
+return;
+}
+
+$("welcomeCard").classList.add("hidden");
+$("submissionCard").classList.remove("hidden");
+$("trackingCard").classList.remove("hidden");
+$("logoutCard").classList.remove("hidden");
+
+$("userEmail").textContent="Signed in as "+(user.email||"AfriSage user");
+
+await loadBooks();
+
+}catch(e){
+console.error(e);
+$("loginStatus").textContent="We could not verify your session: "+(e.message||"Please refresh and sign in again.");
+}
+}
+
+$("submissionForm").addEventListener("submit",async ev=>{
+ev.preventDefault();
+
+if(!user||!db){
+msg("submissionMessage","Please sign in first.","error");
+return;
+}
+
+const title=$("bookTitle").value.trim();
+const description=$("bookDescription").value.trim();
+const man=$("manuscript").files[0];
+const cover=$("cover").files[0];
+
+if(!man||!cover){
+msg("submissionMessage","Choose both manuscript and cover files.","error");
+return;
+}
+
+const me=man.name.split(".").pop().toLowerCase();
+const ce=cover.name.split(".").pop().toLowerCase();
+
+if(!["pdf","docx","epub"].includes(me)){
+msg("submissionMessage","Manuscript must be PDF, DOCX or EPUB.","error");
+return;
+}
+
+if(!["jpg","jpeg","png","webp"].includes(ce)){
+msg("submissionMessage","Cover must be JPG, PNG or WEBP.","error");
+return;
+}
+
+if(man.size>50*1024*1024||cover.size>5*1024*1024){
+msg("submissionMessage","Manuscript limit is 50 MB; cover limit is 5 MB.","error");
+return;
+}
+
+const btn=$("submitButton");
+btn.disabled=true;
+btn.textContent="Uploading…";
+
+let mp=null,cp=null,bid=null;
+
+try{
+const folder=user.id+"/"+Date.now();
+
+mp=folder+"_"+fileName(man.name);
+cp=folder+"_"+fileName(cover.name);
+
+let r=await db.storage.from("manuscripts").upload(mp,man);
+
+if(r.error)throw Error("Manuscript upload failed: "+r.error.message);
+
+r=await db.storage.from("book-covers").upload(cp,cover);
+
+if(r.error)throw Error("Cover upload failed: "+r.error.message);
+
+const {data:b,error:be}=await db.from("books")
+.insert({
+author_id:user.id,
+title,
+description,
+manuscript_path:mp,
+cover_path:cp,
+status:"pending"
+})
+.select("id")
+.single();
+
+if(be)throw Error("Book record failed: "+be.message);
+
+bid=b.id;
+
+const {error:se}=await db.from("book_submissions")
+.insert({book_id:bid});
+
+if(se)throw Error("Book saved, but review record failed: "+se.message);
+
+msg("submissionMessage","Your book was submitted successfully and is awaiting review.","success");
+
+ev.target.reset();
+await loadBooks();
+
+}catch(e){
+console.error(e);
+
+if(bid)await db.from("books").delete().eq("id",bid);
+if(mp)await db.storage.from("manuscripts").remove([mp]);
+if(cp)await db.storage.from("book-covers").remove([cp]);
+
+msg("submissionMessage",e.message||"Submission failed.","error");
+
+}finally{
+btn.disabled=false;
+btn.textContent="Submit book for review";
+}
+});
+
+$("logoutButton").addEventListener("click",async()=>{
+const {error}=await db.auth.signOut();
+
+if(error){
+alert(error.message);
+return;
+}
+
+location.href="account.html";
+});
+
+init();
+})();
+</script>
+
+</body>
+</html>
