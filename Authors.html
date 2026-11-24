@@ -299,7 +299,29 @@ const button=event.submitter;
 button.disabled=true;
 button.textContent="Submitting...";
 
-const submission={
+const book={
+  author_id:currentUser.id,
+  title:document.getElementById("bookTitle").value.trim(),
+  description:document.getElementById("bookSynopsis").value.trim(),
+  status:"pending"
+};
+
+const {data: newBook,error:bookError}=await db
+  .from("books")
+  .insert(book)
+  .select("id")
+  .single();
+
+if(bookError){
+  button.disabled=false;
+  button.textContent="Submit Book Details";
+  showMessage("submissionMessage","Book submission failed: "+bookError.message,"error");
+  return;
+}
+
+const {error}=await db.from("book_submissions").insert({
+  book_id:newBook.id
+});
 author_id:currentUser.id,
 title:document.getElementById("bookTitle").value.trim(),
 category:document.getElementById("bookCategory").value,
