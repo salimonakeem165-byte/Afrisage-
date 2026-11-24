@@ -203,6 +203,62 @@ document.getElementById("authorGenre").value=data.author_genre||"";
 }
 
 async function loadSubmissions(){
+  const list = document.getElementById("submissionList");
+  list.textContent = "Loading submissions...";
+
+  const { data: books, error: booksError } = await db
+    .from("books")
+    .select("id,title,status,created_at")
+    .eq("author_id", currentUser.id)
+    .order("created_at", { ascending: false });
+
+  if (booksError) {
+    list.textContent = "Unable to load your books: " + booksError.message;
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!books || books.length === 0) {
+    list.textContent = "You have not submitted any books yet.";
+    return;
+  }
+
+  const bookIds = books.map(book => book.id);
+
+  const { data: submissions, error } = await db
+    .from("book_submissions")
+    .select("book_id,review_notes,submitted_at")
+    .in("book_id", bookIds);
+
+  if (error) {
+    list.textContent = "Unable to load submission records: " + error.message;
+    return;
+  }
+
+  books.forEach(book => {
+    const item = document.createElement("div");
+    item.className = "status-item";
+
+    const title = document.createElement("strong");
+    title.textContent = book.title;
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + book.status;
+
+    item.append(title, status);
+
+    const record = submissions?.find(s => s.book_id === book.id);
+
+    if (record?.review_notes) {
+      const notes = document.createElement("p");
+      notes.textContent = "Review notes: " + record.review_notes;
+      item.appendChild(notes);
+    }
+
+    list.appendChild(item);
+  });
+}
 const list=document.getElementById("submissionList");
 list.textContent="Loading submissions...";
 
