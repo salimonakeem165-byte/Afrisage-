@@ -137,19 +137,56 @@ async function loadChapters(){
  say((data||[]).length+" chapter(s) loaded.");
 }
 
-function renderChapters(chapters){
- const box=document.getElementById("chapterList");box.innerHTML="";
- if(!chapters.length){box.textContent="No chapters have been added to this book yet.";return;}
+
+ constfunction renderChapters(chapters){
+ const box=document.getElementById("chapterList");
+ box.innerHTML="";
+
+ if(!chapters.length){
+  box.textContent="No chapters have been added yet.";
+  return;
+ }
+
  chapters.forEach(ch=>{
-  const item=document.createElement("div");item.className="chapter";
+  const item=document.createElement("div");
+  item.className="chapter";
+
   const title=document.createElement("strong");
   title.textContent="Chapter "+ch.chapter_number+": "+ch.chapter_title;
-  const edit=document.createElement("button");edit.textContent="Edit";
+
+  const read=document.createElement("button");
+  read.textContent="Read";
+  read.onclick=()=>openChapter(ch);
+
+  const edit=document.createElement("button");
+  edit.textContent="Edit";
   edit.onclick=()=>editChapter(ch);
-  const remove=document.createElement("button");remove.textContent="Delete";remove.className="secondary";
+
+  const remove=document.createElement("button");
+  remove.textContent="Delete";
+  remove.className="secondary";
   remove.onclick=()=>deleteChapter(ch.id,ch.chapter_number);
-  item.append(title,document.createElement("br"),edit,remove);box.appendChild(item);
+
+  item.append(title,document.createElement("br"),read,edit,remove);
+  box.appendChild(item);
  });
+}
+
+function openChapter(ch){
+ document.getElementById("readerTitle").textContent=
+  "Chapter "+ch.chapter_number+": "+ch.chapter_title;
+
+ document.getElementById("readerContent").textContent=ch.content;
+ document.getElementById("readerCard").hidden=false;
+
+ document.getElementById("readerCard").scrollIntoView({
+  behavior:"smooth",
+  block:"start"
+ });
+}
+
+function closeReader(){
+ document.getElementById("readerCard").hidden=true;
 }
 
 function editChapter(ch){
