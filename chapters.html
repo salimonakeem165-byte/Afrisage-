@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AfriSage Chapter Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
@@ -16,7 +15,7 @@ main{max-width:760px;margin:25px auto;padding:16px}
 label{display:block;color:#e2c77f;margin:16px 0 8px}
 input,select,textarea{width:100%;padding:14px;border:1px solid #555;border-radius:9px;background:#292929;color:white;font:inherit;font-size:16px}
 textarea{min-height:250px;line-height:1.7}
-button{padding:14px 18px;border:0;border-radius:9px;background:#d5a63e;color:#111;font-weight:bold;font-size:16px;cursor:pointer;touch-action:manipulation}
+button{padding:14px 18px;border:0;border-radius:9px;background:#d5a63e;color:#111;font-weight:bold;font-size:16px;cursor:pointer;touch-action:manipulation;min-height:48px}
 button:disabled{opacity:.5}
 .secondary{background:#444;color:white}
 .row{display:flex;gap:10px;margin-top:14px}
@@ -25,13 +24,17 @@ button:disabled{opacity:.5}
 .small{color:#bbb;line-height:1.6}
 .chapter{border-top:1px solid #555;padding:18px 0}
 .chapter-title{color:#e2c77f;font-size:18px;font-weight:bold;margin-bottom:12px}
-.reader-text{white-space:pre-wrap;line-height:1.9;overflow-wrap:anywhere}
+.chapter-actions{display:flex;gap:8px;flex-wrap:wrap}
+.reader-text{white-space:pre-wrap;line-height:1.9;overflow-wrap:anywhere;font-size:17px}
+.reader-card{border:2px solid #d5a63e}
 a{color:#e2c77f}
 [hidden]{display:none!important}
-@media(max-width:480px){main{padding:12px}.card{padding:18px}.row{flex-direction:column}.row button{width:100%}}
+@media(max-width:480px){
+ main{padding:12px}.card{padding:18px}
+ .row{flex-direction:column}.row button{width:100%}
+}
 </style>
 </head>
-
 <body>
 <header>
 <h1>AfriSage</h1>
@@ -46,10 +49,8 @@ a{color:#e2c77f}
 <div id="loginArea">
 <label>Email Address</label>
 <input id="email" type="email" autocomplete="username">
-
 <label>Password</label>
 <input id="password" type="password" autocomplete="current-password">
-
 <button type="button" id="loginBtn">Sign In</button>
 </div>
 
@@ -58,23 +59,17 @@ a{color:#e2c77f}
 <button type="button" id="logoutBtn" class="secondary">Sign Out</button>
 </div>
 
-<div id="message" class="message" role="status" aria-live="polite">
-Checking AfriSage connection...
-</div>
+<div id="message" class="message" role="status" aria-live="polite">Checking connection...</div>
 </section>
 
 <section class="card" id="manager" hidden>
 <h2>Your Published Books</h2>
 <label>Select a Book</label>
-<select id="bookSelect">
-<option value="">Choose a book</option>
-</select>
-<p class="small">Only your published books appear here.</p>
+<select id="bookSelect"><option value="">Choose a book</option></select>
 </section>
 
 <section class="card" id="editor" hidden>
 <h2 id="editorHeading">Add a Chapter</h2>
-
 <input type="hidden" id="chapterId">
 
 <label>Chapter Number</label>
@@ -90,356 +85,247 @@ Checking AfriSage connection...
 <button type="button" id="saveBtn">Save Chapter</button>
 <button type="button" id="clearBtn" class="secondary">Clear</button>
 </div>
-
-<p class="small">Save each chapter separately. Each chapter must have a unique number within its book.</p>
-</section>
-
-<section class="card" id="readerCard" hidden>
-<h2 id="readerTitle">Chapter Reading</h2>
-<div id="readerContent" class="reader-text"></div>
-<button type="button" id="closeReaderBtn" class="secondary">Close Chapter</button>
+<p class="small">Save each chapter separately. Every chapter must have a unique number within its book.</p>
 </section>
 
 <section class="card" id="chapterListCard" hidden>
 <h2>Saved Chapters</h2>
-<p class="small">Read, edit or delete your saved chapters below.</p>
+<p class="small">Select Read to open a chapter, Edit to change it, or Delete to remove it.</p>
 <div id="chapterList"></div>
 </section>
 
-<p style="text-align:center">
-<a href="books.html">Return to Bookstore</a>
-</p>
+<!-- READING PANEL NOW APPEARS BELOW SAVED CHAPTERS -->
+<section class="card reader-card" id="readerCard" hidden>
+<h2 id="readerTitle">Chapter Reading</h2>
+<div id="readerContent" class="reader-text"></div>
+<br>
+<button type="button" id="closeReaderBtn" class="secondary">Close Chapter</button>
+</section>
+
+<p style="text-align:center"><a href="books.html">Return to Bookstore</a></p>
 </main>
 
 <script>
 (function(){
+"use strict";
 
-const URL = "https://hwepbiptkyyclolujwss.supabase.co";
-const KEY = "sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+const URL="https://hwepbiptkyyclolujwss.supabase.co";
+const KEY="sb_publishable_r224RF354eCJGM0qs_bJ5g_t084YO8_";
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
+let db=null,currentUser=null,busy=false;
 
-let db = null;
-let currentUser = null;
-let busy = false;
-
-function say(message){
-  $("message").textContent = message;
-}
-
-function show(id, visible){
-  $(id).hidden = !visible;
-}
+function say(message){$("message").textContent=message}
+function show(id,visible){$(id).hidden=!visible}
 
 function clearEditor(){
-  $("chapterId").value = "";
-  $("chapterNumber").value = "";
-  $("chapterTitle").value = "";
-  $("chapterContent").value = "";
-  $("editorHeading").textContent = "Add a Chapter";
-  $("saveBtn").textContent = "Save Chapter";
+ $("chapterId").value="";
+ $("chapterNumber").value="";
+ $("chapterTitle").value="";
+ $("chapterContent").value="";
+ $("editorHeading").textContent="Add a Chapter";
+ $("saveBtn").textContent="Save Chapter";
 }
 
 async function start(){
-  try{
-    if(!window.supabase){
-      throw new Error("AfriSage connection library did not load. Check your internet connection and reload.");
-    }
-
-    db = window.supabase.createClient(URL,KEY);
-
-    const {data,error} = await db.auth.getSession();
-    if(error) throw error;
-
-    if(data.session){
-      currentUser = data.session.user;
-      await initialise();
-    }else{
-      say("Please sign in to manage your chapters.");
-    }
-
-  }catch(error){
-    say("Connection problem: " + error.message);
-  }
+ try{
+  if(!window.supabase) throw new Error("Supabase library did not load. Check your internet.");
+  db=window.supabase.createClient(URL,KEY);
+  const {data,error}=await db.auth.getSession();
+  if(error) throw error;
+  if(data.session){
+   currentUser=data.session.user;
+   await initialise();
+  }else say("Please sign in to manage your chapters.");
+ }catch(e){say("Connection problem: "+e.message)}
 }
 
 async function login(){
-  if(busy) return;
-
-  const email = $("email").value.trim();
-  const password = $("password").value;
-
-  if(!email || !password){
-    say("Enter your email address and password.");
-    return;
-  }
-
-  busy = true;
-  $("loginBtn").disabled = true;
-  say("Signing in...");
-
-  try{
-    const {data,error} = await db.auth.signInWithPassword({email,password});
-    if(error) throw error;
-
-    currentUser = data.user;
-    await initialise();
-
-  }catch(error){
-    say("Sign-in failed: " + error.message);
-  }finally{
-    busy = false;
-    $("loginBtn").disabled = false;
-  }
+ if(busy)return;
+ const email=$("email").value.trim();
+ const password=$("password").value;
+ if(!email||!password){say("Enter your email and password.");return}
+ busy=true;
+ $("loginBtn").disabled=true;
+ say("Signing in...");
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  currentUser=data.user;
+  await initialise();
+ }catch(e){say("Sign-in failed: "+e.message)}
+ finally{busy=false;$("loginBtn").disabled=false}
 }
 
 async function initialise(){
-  show("loginArea",false);
-  show("accountArea",true);
-  show("manager",true);
-
-  $("signedInAs").textContent = "Signed in as " + currentUser.email;
-  say("Loading your published books...");
-
-  try{
-    const {data,error} = await db
-      .from("books")
-      .select("id,title")
-      .eq("author_id",currentUser.id)
-      .eq("status","published")
-      .order("created_at",{ascending:false});
-
-    if(error) throw error;
-
-    const select = $("bookSelect");
-    select.innerHTML = '<option value="">Choose a book</option>';
-
-    if(!data || data.length === 0){
-      say("No published books were found for this account.");
-      return;
-    }
-
-    data.forEach(book=>{
-      const option = document.createElement("option");
-      option.value = book.id;
-      option.textContent = book.title;
-      select.appendChild(option);
-    });
-
-    say("Choose a book to manage its chapters.");
-
-  }catch(error){
-    say("Could not load books: " + error.message);
-  }
+ show("loginArea",false);
+ show("accountArea",true);
+ show("manager",true);
+ $("signedInAs").textContent="Signed in as "+currentUser.email;
+ say("Loading your published books...");
+ try{
+  const {data,error}=await db.from("books")
+   .select("id,title")
+   .eq("author_id",currentUser.id)
+   .eq("status","published")
+   .order("created_at",{ascending:false});
+  if(error)throw error;
+  const select=$("bookSelect");
+  select.innerHTML='<option value="">Choose a book</option>';
+  if(!data||!data.length){say("No published books found.");return}
+  data.forEach(book=>{
+   const option=document.createElement("option");
+   option.value=book.id;
+   option.textContent=book.title;
+   select.appendChild(option);
+  });
+  say("Choose a book to manage its chapters.");
+ }catch(e){say("Could not load books: "+e.message)}
 }
 
 async function loadChapters(){
-  const bookId = $("bookSelect").value;
-
-  show("editor",!!bookId);
-  show("chapterListCard",!!bookId);
-  show("readerCard",false);
-
-  clearEditor();
-
-  if(!bookId){
-    $("chapterList").innerHTML = "";
-    return;
-  }
-
-  say("Loading saved chapters...");
-
-  try{
-    const {data,error} = await db
-      .from("chapters")
-      .select("id,chapter_number,chapter_title,content,created_at")
-      .eq("book_id",bookId)
-      .order("chapter_number",{ascending:true});
-
-    if(error) throw error;
-
-    renderChapters(data || []);
-    say((data || []).length + " chapter(s) loaded.");
-
-  }catch(error){
-    say("Could not load chapters: " + error.message);
-  }
+ const bookId=$("bookSelect").value;
+ show("editor",!!bookId);
+ show("chapterListCard",!!bookId);
+ show("readerCard",false);
+ clearEditor();
+ if(!bookId){$("chapterList").innerHTML="";return}
+ say("Loading chapters...");
+ try{
+  const {data,error}=await db.from("chapters")
+   .select("id,chapter_number,chapter_title,content,created_at")
+   .eq("book_id",bookId)
+   .order("chapter_number",{ascending:true});
+  if(error)throw error;
+  renderChapters(data||[]);
+  say((data||[]).length+" chapter(s) loaded.");
+ }catch(e){say("Could not load chapters: "+e.message)}
 }
 
 function renderChapters(chapters){
-  const box = $("chapterList");
-  box.innerHTML = "";
+ const box=$("chapterList");
+ box.innerHTML="";
+ if(!chapters.length){
+  box.textContent="No chapters have been saved for this book yet.";
+  return;
+ }
+ chapters.forEach(ch=>{
+  const item=document.createElement("div");
+  item.className="chapter";
 
-  if(chapters.length === 0){
-    box.textContent = "No chapters have been saved for this book yet.";
-    return;
-  }
+  const title=document.createElement("div");
+  title.className="chapter-title";
+  title.textContent="Chapter "+ch.chapter_number+": "+ch.chapter_title;
 
-  chapters.forEach(ch=>{
-    const item = document.createElement("div");
-    item.className = "chapter";
+  const actions=document.createElement("div");
+  actions.className="chapter-actions";
 
-    const title = document.createElement("div");
-    title.className = "chapter-title";
-    title.textContent = "Chapter " + ch.chapter_number + ": " + ch.chapter_title;
-
-    const read = document.createElement("button");
-    read.type = "button";
-    read.textContent = "Read";
-    read.addEventListener("click",()=>openChapter(ch));
-
-    const edit = document.createElement("button");
-    edit.type = "button";
-    edit.textContent = "Edit";
-    edit.className = "secondary";
-    edit.addEventListener("click",()=>editChapter(ch));
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "Delete";
-    remove.className = "secondary";
-    remove.addEventListener("click",()=>deleteChapter(ch.id,ch.chapter_number));
-
-    item.append(title,read,edit,remove);
-    box.appendChild(item);
+  const read=document.createElement("button");
+  read.type="button";
+  read.textContent="Read";
+  read.addEventListener("click",function(){
+   openChapter(ch);
   });
+
+  const edit=document.createElement("button");
+  edit.type="button";
+  edit.textContent="Edit";
+  edit.className="secondary";
+  edit.addEventListener("click",function(){editChapter(ch)});
+
+  const remove=document.createElement("button");
+  remove.type="button";
+  remove.textContent="Delete";
+  remove.className="secondary";
+  remove.addEventListener("click",function(){deleteChapter(ch.id,ch.chapter_number)});
+
+  actions.append(read,edit,remove);
+  item.append(title,actions);
+  box.appendChild(item);
+ });
 }
 
 function openChapter(ch){
-  $("readerTitle").textContent =
-    "Chapter " + ch.chapter_number + ": " + ch.chapter_title;
-
-  $("readerContent").textContent = ch.content;
-  show("readerCard",true);
-  $("readerCard").scrollIntoView({behavior:"smooth"});
+ $("readerTitle").textContent="Chapter "+ch.chapter_number+": "+ch.chapter_title;
+ $("readerContent").textContent=ch.content||"This chapter has no content.";
+ show("readerCard",true);
+ $("readerCard").scrollIntoView({behavior:"auto",block:"start"});
+ say("Now reading Chapter "+ch.chapter_number+".");
 }
 
 function editChapter(ch){
-  $("chapterId").value = ch.id;
-  $("chapterNumber").value = ch.chapter_number;
-  $("chapterTitle").value = ch.chapter_title;
-  $("chapterContent").value = ch.content;
-
-  $("editorHeading").textContent = "Edit Chapter";
-  $("saveBtn").textContent = "Update Chapter";
-
-  $("editor").scrollIntoView({behavior:"smooth"});
+ $("chapterId").value=ch.id;
+ $("chapterNumber").value=ch.chapter_number;
+ $("chapterTitle").value=ch.chapter_title;
+ $("chapterContent").value=ch.content;
+ $("editorHeading").textContent="Edit Chapter";
+ $("saveBtn").textContent="Update Chapter";
+ $("editor").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 async function saveChapter(){
-  if(busy) return;
+ if(busy)return;
+ const bookId=$("bookSelect").value;
+ const id=$("chapterId").value;
+ const number=Number($("chapterNumber").value);
+ const title=$("chapterTitle").value.trim();
+ const content=$("chapterContent").value.trim();
 
-  const bookId = $("bookSelect").value;
-  const id = $("chapterId").value;
-  const number = Number($("chapterNumber").value);
-  const title = $("chapterTitle").value.trim();
-  const content = $("chapterContent").value.trim();
+ if(!bookId){say("Select a book first.");return}
+ if(!Number.isInteger(number)||number<1){say("Enter a valid chapter number.");return}
+ if(!title||!content){say("Enter the chapter title and content.");return}
 
-  if(!bookId){
-    say("Select a book first.");
-    return;
+ busy=true;
+ $("saveBtn").disabled=true;
+ say("Saving chapter...");
+ try{
+  let result;
+  if(id){
+   result=await db.from("chapters").update({
+    chapter_number:number,chapter_title:title,content:content
+   }).eq("id",id).eq("book_id",bookId).select();
+  }else{
+   result=await db.from("chapters").insert({
+    book_id:bookId,chapter_number:number,chapter_title:title,content:content
+   }).select();
   }
-
-  if(!Number.isInteger(number) || number < 1){
-    say("Enter a valid chapter number.");
-    return;
-  }
-
-  if(!title || !content){
-    say("Enter both the chapter title and chapter content.");
-    return;
-  }
-
-  busy = true;
-  $("saveBtn").disabled = true;
-  say("Saving chapter...");
-
-  try{
-    let result;
-
-    if(id){
-      result = await db.from("chapters")
-        .update({
-          chapter_number:number,
-          chapter_title:title,
-          content:content
-        })
-        .eq("id",id)
-        .eq("book_id",bookId)
-        .select();
-    }else{
-      result = await db.from("chapters")
-        .insert({
-          book_id:bookId,
-          chapter_number:number,
-          chapter_title:title,
-          content:content
-        })
-        .select();
-    }
-
-    if(result.error) throw result.error;
-
-    if(!result.data || result.data.length === 0){
-      throw new Error("No chapter was saved. Check your chapter permissions.");
-    }
-
-    clearEditor();
-    await loadChapters();
-    say("Chapter saved successfully!");
-
-  }catch(error){
-    say("Could not save chapter: " + error.message);
-  }finally{
-    busy = false;
-    $("saveBtn").disabled = false;
-  }
+  if(result.error)throw result.error;
+  if(!result.data||!result.data.length)throw new Error("No chapter was saved.");
+  clearEditor();
+  await loadChapters();
+  say("Chapter saved successfully!");
+ }catch(e){say("Could not save chapter: "+e.message)}
+ finally{busy=false;$("saveBtn").disabled=false}
 }
 
 async function deleteChapter(id,number){
-  if(!confirm("Delete Chapter " + number + "? This cannot be undone.")) return;
-
-  say("Deleting chapter...");
-
-  try{
-    const {error} = await db
-      .from("chapters")
-      .delete()
-      .eq("id",id);
-
-    if(error) throw error;
-
-    await loadChapters();
-    say("Chapter deleted successfully.");
-
-  }catch(error){
-    say("Could not delete chapter: " + error.message);
-  }
+ if(!confirm("Delete Chapter "+number+"? This cannot be undone."))return;
+ say("Deleting chapter...");
+ try{
+  const {error}=await db.from("chapters").delete().eq("id",id);
+  if(error)throw error;
+  show("readerCard",false);
+  await loadChapters();
+  say("Chapter deleted successfully.");
+ }catch(e){say("Could not delete chapter: "+e.message)}
 }
 
 async function logout(){
-  try{
-    const {error} = await db.auth.signOut();
-    if(error) throw error;
-
-    currentUser = null;
-
-    show("loginArea",true);
-    show("accountArea",false);
-    show("manager",false);
-    show("editor",false);
-    show("chapterListCard",false);
-    show("readerCard",false);
-
-    $("bookSelect").innerHTML = '<option value="">Choose a book</option>';
-    $("chapterList").innerHTML = "";
-
-    clearEditor();
-    say("You have signed out.");
-
-  }catch(error){
-    say("Sign-out failed: " + error.message);
-  }
+ try{
+  const {error}=await db.auth.signOut();
+  if(error)throw error;
+  currentUser=null;
+  show("loginArea",true);
+  show("accountArea",false);
+  show("manager",false);
+  show("editor",false);
+  show("chapterListCard",false);
+  show("readerCard",false);
+  $("bookSelect").innerHTML='<option value="">Choose a book</option>';
+  $("chapterList").innerHTML="";
+  clearEditor();
+  say("You have signed out.");
+ }catch(e){say("Sign-out failed: "+e.message)}
 }
 
 $("loginBtn").addEventListener("click",login);
@@ -450,8 +336,7 @@ $("clearBtn").addEventListener("click",clearEditor);
 $("closeReaderBtn").addEventListener("click",()=>show("readerCard",false));
 
 start();
-
 })();
 </script>
 </body>
-</html>
+  </html>
