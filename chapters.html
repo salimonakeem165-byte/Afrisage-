@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AfriSage Chapter Manager</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -34,14 +33,12 @@ a{color:#e2c77f}
 </head>
 
 <body>
-
 <header>
 <h1>AfriSage</h1>
 <p>Author Chapter Manager</p>
 </header>
 
 <main>
-
 <section class="card">
 <h2>Author Sign In</h2>
 <p class="small">Sign in using the AfriSage account that owns the book.</p>
@@ -112,7 +109,6 @@ Checking AfriSage connection...
 <p style="text-align:center">
 <a href="books.html">Return to Bookstore</a>
 </p>
-
 </main>
 
 <script>
@@ -153,7 +149,6 @@ async function start(){
     db = window.supabase.createClient(URL,KEY);
 
     const {data,error} = await db.auth.getSession();
-
     if(error) throw error;
 
     if(data.session){
@@ -185,7 +180,6 @@ async function login(){
 
   try{
     const {data,error} = await db.auth.signInWithPassword({email,password});
-
     if(error) throw error;
 
     currentUser = data.user;
@@ -205,7 +199,6 @@ async function initialise(){
   show("manager",true);
 
   $("signedInAs").textContent = "Signed in as " + currentUser.email;
-
   say("Loading your published books...");
 
   try{
@@ -460,6 +453,5 @@ start();
 
 })();
 </script>
-
 </body>
 </html>
